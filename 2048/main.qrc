@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file alias="AppIcon">2048.ico</file>
+    </qresource>
+</RCC>
