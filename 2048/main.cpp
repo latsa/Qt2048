@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
    QApplication::setApplicationName("2048");
 
    UserInterface mainWindow;
+   
    mainWindow.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
    mainWindow.show();
    return a.exec();

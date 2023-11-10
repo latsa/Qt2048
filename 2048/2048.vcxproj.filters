@@ -23,6 +23,9 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{3952ba85-1675-41b1-967c-72ccf73e0c37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\AI">
+      <UniqueIdentifier>{f75c59c9-7c21-44ce-a840-5f8fd04420ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="main.qrc">
@@ -52,6 +55,12 @@
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="cell.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="SearchTree.cpp">
+      <Filter>Source Files\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -85,6 +94,12 @@
       <Filter>Source Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="cell.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchTree.h">
+      <Filter>Source Files\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,6 +10,30 @@
 
 #include "board.h"
 
+// define the order in which tiles are processed after an arrow key was pressed
+static Cell g_order_up[16] = { {0,0},{0,1},{0,2},{0,3}, {1,0},{1,1},{1,2},{1,3}, {2,0},{2,1},{2,2},{2,3}, {3,0},{3,1},{3,2},{3,3} };
+static Cell g_order_down[16] = { {3,3},{3,2},{3,1},{3,0}, {2,3},{2,2},{2,1},{2,0}, {1,3},{1,2},{1,1},{1,0}, {0,3},{0,2},{0,1},{0,0} };
+static Cell g_order_left[16] = { {0,0},{1,0},{2,0},{3,0}, {0,1},{1,1},{2,1},{3,1}, {0,2},{1,2},{2,2},{3,2}, {0,3},{1,3},{2,3},{3,3} };
+static Cell g_order_right[16] = { {3,3},{2,3},{1,3},{0,3},  {3,2},{2,2},{1,2},{0,2}, {3,1},{2,1},{1,1},{0,1}, {3,0},{2,0},{1,0},{0,0} };
+
+static Cell g_order_forward[16] = { {0,0},{1,0},{2,0},{3,0},{0,1},{1,1},{2,1},{3,1},{0,2},{1,2},{2,2},{3,2},{0,3},{1,3},{2,3},{3,3} };
+static Cell g_order_backward[16] = { {3,3},{2,3},{1,3},{0,3},{3,2},{2,2},{1,2},{0,2},{3,1},{2,1},{1,1},{0,1},{3,0},{2,0},{1,0},{0,0} };
+
+
+// map values to colors
+static QMap<int, QColor>  g_fg_map = {
+   { 0, QColor(0x77,0x6e,0x65) }, { 2, QColor(0x77,0x6e,0x65) }, { 4, QColor(0x77,0x6e,0x65) }, { 8,QColor(0xf9,0xf6,0xf2) },
+   { 16,QColor(0xf9,0xf6,0xf2) }, { 32,QColor(0xf9,0xf6,0xf2) }, { 64,QColor(0xf9,0xf6,0xf2) }, { 128,QColor(0xf9,0xf6,0xf2) },
+   { 256,QColor(0xf9,0xf6,0xf2) }, { 512,QColor(0xf9,0xf6,0xf2) }, { 1024,QColor(0xf9,0xf6,0xf2) }, { 2048,QColor(0xf9,0xf6,0xf2) },
+   { 4096,QColor(0xf9,0xf6,0xf2) } };
+
+static QMap<int, QColor> g_bg_map = {
+   { 0, QColor(0xee,0xe4,0xda) }, { 2, QColor(0xee,0xe4,0xda) }, { 4, QColor(0xed,0xe0,0xc8) }, { 8, QColor(0xf2,0xb1,0x79) },
+   { 16, QColor(0xf5,0x95,0x63) }, { 32, QColor(0xf6,0x7c,0x5f) }, { 64, QColor(0xf6,0x5e,0x3b) }, { 128, QColor(0xed,0xcf,0x72) },
+   { 256, QColor(0xed,0xcc,0x61) }, { 512, QColor(0xed,0xc8,0x50) }, { 1024, QColor(0xed,0xc5,0x3f) }, { 2048, QColor(0xed,0xc2,0x2e) },
+   { 4096, QColor(0x3c,0x3a,0x32) } };
+
+
 Board::Board(QWidget* parent): 
    m_parent(parent) {
    m_graphicsScene = new QGraphicsScene(this);
@@ -19,30 +43,32 @@ Board::Board(QWidget* parent):
    connect(m_animation_timer,SIGNAL(timeout()),this,SLOT(animation_timeout()));
    m_animation_timer->start(1);
 
-   addTile();
+   addTile(&m_tiles);
 }
 
 // Returns the number of free slots.
-int Board::freeSlots() {
+
+int Board::freeSlots(Tile (*tiles)[4][4]) {
    int free_slot_count = 0;
 
    for (int i = 0; i < 16; i++)
-      if (0 == m_tiles[m_order_forward[i].px][m_order_forward[i].py].value)
+      if (0 == (*tiles)[g_order_forward[i].px][g_order_forward[i].py].value)
          free_slot_count++;
 
    return free_slot_count;
 }
 
 // Add a random tile to the board. Possible values 2 or 4.
-int Board::addTile() {
+
+int Board::addTile(Tile(*tiles)[4][4]) {
 
    // count free slots
-   int free_slot_count = 0; 
+   int free_slot_count = 0;
    int free_slots[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
    int last_slot = -1;
 
    for (int i = 0; i < 16; i++) {
-      if (0 == m_tiles[m_order_forward[i].px][m_order_forward[i].py].value) {
+      if (0 == (*tiles)[g_order_forward[i].px][g_order_forward[i].py].value) {
          last_slot = i;
          free_slots[free_slot_count] = i;
          free_slot_count++;
@@ -55,10 +81,9 @@ int Board::addTile() {
    int pos = (1 == free_slot_count) ? last_slot : free_slots[QRandomGenerator::global()->bounded(free_slot_count - 1)];
    int val = QRandomGenerator::global()->bounded(4) < 2 ? 2 : 4;
 
-   m_tiles[m_order_forward[pos].px][m_order_forward[pos].py].value = val;
+   (*tiles)[g_order_forward[pos].px][g_order_forward[pos].py].value = val;
    return free_slot_count - 1;
 }
-
 
 void Board::updateTile(int lx, int ly) {
    m_tiles[lx][ly].ismoving = false;
@@ -87,6 +112,7 @@ void Board::updateTile(int lx, int ly) {
    // reset source tile   
    m_tiles[lx][ly].value = 0;
 }
+
 
 void Board::animation_timeout() {
    bool redraw = false;
@@ -177,8 +203,8 @@ void Board::drawForeground(QPainter* painter, const QRectF& rect) {
             if (val > 4096)
                val = 4096;
 
-            QColor bg = m_bg_map[val];
-            QColor fg = m_fg_map[val];
+            QColor bg = g_bg_map[val];
+            QColor fg = g_fg_map[val];
 
             // draw tile background
             painter->fillRect(px, py, w4, h4, bg);
@@ -222,17 +248,18 @@ void Board::drawBackground(QPainter* painter, const QRectF& rect) {
 
 // Returns true if the tile can be moved from logical coordinates [sx,sy] to 
 // [tx,ty], otherwise it returns false.
-bool Board::canMove(int sx, int sy, int tx, int ty) {
+
+bool Board::canMove(Tile(*tiles)[4][4], int sx, int sy, int tx, int ty) {
    if (sx < 0 || sx > 3 || sy < 0 || sy > 3 || tx < 0 || tx > 3 || ty < 0 || ty > 3)
       return false;
 
    if (sx == tx && sy == ty)
       return false;
 
-   if (m_tiles[sx][sy].value <= 0)
+   if ((*tiles)[sx][sy].value <= 0)
       return false;
 
-   if ((m_tiles[tx][ty].value > 0) && (m_tiles[sx][sy].value != m_tiles[tx][ty].value))
+   if (((*tiles)[tx][ty].value > 0) && ((*tiles)[sx][sy].value != (*tiles)[tx][ty].value))
       return false;
 
    return true;
@@ -240,39 +267,40 @@ bool Board::canMove(int sx, int sy, int tx, int ty) {
 
 // It sets up the animation parameters for a a tile to be moved
 // from logical coordinates [sx,sy] to [tx,ty].
-bool Board::moveTile(int sx, int sy, int tx, int ty) {
 
-   if (!canMove(sx, sy, tx, ty))
+bool Board::moveTile(Tile(*tiles)[4][4], Cell(*pos)[4][4], int sx, int sy, int tx, int ty) {
+
+   if (!canMove(tiles, sx, sy, tx, ty))
       return false;
 
-   m_tiles[sx][sy].lsource.px = sx;
-   m_tiles[sx][sy].lsource.py = sy;
-   m_tiles[sx][sy].ltarget.px = tx;
-   m_tiles[sx][sy].ltarget.py = ty;
+   (*tiles)[sx][sy].lsource.px = sx;
+   (*tiles)[sx][sy].lsource.py = sy;
+   (*tiles)[sx][sy].ltarget.px = tx;
+   (*tiles)[sx][sy].ltarget.py = ty;
 
-   m_tiles[sx][sy].psource.px = m_pos[sx][sy].px;
-   m_tiles[sx][sy].psource.py = m_pos[sx][sy].py;
-   m_tiles[sx][sy].ptarget.px = m_pos[tx][ty].px;
-   m_tiles[sx][sy].ptarget.py = m_pos[tx][ty].py;
+   (*tiles)[sx][sy].psource.px = (*pos)[sx][sy].px;
+   (*tiles)[sx][sy].psource.py = (*pos)[sx][sy].py;
+   (*tiles)[sx][sy].ptarget.px = (*pos)[tx][ty].px;
+   (*tiles)[sx][sy].ptarget.py = (*pos)[tx][ty].py;
 
-   m_tiles[sx][sy].pcurrent.px = m_tiles[sx][sy].psource.px;
-   m_tiles[sx][sy].pcurrent.py = m_tiles[sx][sy].psource.py;
-   m_tiles[sx][sy].ismoving = true;
+   (*tiles)[sx][sy].pcurrent.px = (*tiles)[sx][sy].psource.px;
+   (*tiles)[sx][sy].pcurrent.py = (*tiles)[sx][sy].psource.py;
+   (*tiles)[sx][sy].ismoving = true;
 
    qDebug() << "move (" << sx << "," << sy << ") to (" << tx << "," << ty << ")";
 
-   while (isMoving())
+   while (isMoving(tiles))
       qApp->processEvents();
-   
+
    return true;
 }
 
 // Returns true is at least one tile is moving, otherwise it returns false.
-bool Board::isMoving() {
+bool Board::isMoving(Tile(*tiles)[4][4]) {
 
    for (int ly = 0; ly < 4; ly++)
       for (int lx = 0; lx < 4; lx++)
-         if (m_tiles[lx][ly].ismoving)
+         if ((*tiles)[lx][ly].ismoving)
             return true;
 
    return false;
@@ -280,20 +308,21 @@ bool Board::isMoving() {
 
 // It checks for game over condition: if there are no free slots left, and 
 // none of the tiles can be merged then it is game over
-void Board::checkGameOver() {
+
+bool Board::checkGameOver(Tile(*tiles)[4][4], int& score) {
    bool gameover = true;
 
-   if (freeSlots() > 0)
+   if (freeSlots(tiles) > 0)
       gameover = false; // there are free slots left
    else {
       for (int i = 0; i < 16; i++) {
-         int lx = m_order_forward[i].px;
-         int ly = m_order_forward[i].py;
+         int lx = g_order_forward[i].px;
+         int ly = g_order_forward[i].py;
 
-         if (((lx < 3) && (m_tiles[lx][ly].value == m_tiles[lx + 1][ly].value)) ||
-            ((lx > 0) && (m_tiles[lx][ly].value == m_tiles[lx - 1][ly].value)) ||
-            ((ly < 3) && (m_tiles[lx][ly].value == m_tiles[lx][ly + 1].value)) ||
-            ((ly > 0) && (m_tiles[lx][ly].value == m_tiles[lx][ly - 1].value))) {
+         if (((lx < 3) && ((*tiles)[lx][ly].value == (*tiles)[lx + 1][ly].value)) ||
+            ((lx > 0) && ((*tiles)[lx][ly].value == (*tiles)[lx - 1][ly].value)) ||
+            ((ly < 3) && ((*tiles)[lx][ly].value == (*tiles)[lx][ly + 1].value)) ||
+            ((ly > 0) && ((*tiles)[lx][ly].value == (*tiles)[lx][ly - 1].value))) {
             gameover = false; // found mergeable tiles
             break;
          }
@@ -301,46 +330,56 @@ void Board::checkGameOver() {
    }
 
    if (gameover) {
-      QMessageBox::information(m_parent, "2048", "Game over! Try again.", QMessageBox::StandardButton::Retry);
-      newGame();
+      QMessageBox::information(0, "2048", "Game over! Try again.", QMessageBox::StandardButton::Retry);
+      newGame(tiles, score);
    }
+
+   return gameover;
 }
 
-void Board::moveLeft() {
+bool Board::moveLeft() {
+   return moveLeft(&m_tiles, &m_pos, m_score);
+}
+
+bool Board::moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
    bool addNew = false;
-   
-   for (int ly=0;ly<4;ly++) {
+
+   for (int ly = 0; ly < 4; ly++) {
       bool merged = false;
       for (int lx = 0; lx < 4; lx++) {
 
          if (lx < 1)
             continue;
 
-         if (m_tiles[lx][ly].value <= 0)
+         if ((*tiles)[lx][ly].value <= 0)
             continue;
 
          int tx = lx;
-         
-         for (int mx=lx-1;mx>-1;mx--)
-            if (0 == m_tiles[mx][ly].value)
+
+         for (int mx = lx - 1; mx > -1; mx--)
+            if (0 == (*tiles)[mx][ly].value)
                tx = mx;
 
 
-         if (!merged && (tx>0) && (m_tiles[lx][ly].value == m_tiles[tx - 1][ly].value))
+         if (!merged && (tx > 0) && ((*tiles)[lx][ly].value == (*tiles)[tx - 1][ly].value))
             tx--, merged = true;
 
-         if (tx<lx && moveTile(lx, ly, tx, ly))
+         if (tx < lx && moveTile(tiles, pos, lx, ly, tx, ly))
             addNew = true;
       }
    }
 
    if (addNew)
-      addTile();
+      addTile(tiles);
 
-   checkGameOver();
+   return checkGameOver(tiles, score);
 }
 
-void Board::moveRight() {
+bool Board::moveRight() {
+   return moveRight(&m_tiles, &m_pos, m_score);
+}
+
+bool Board::moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
    bool addNew = false;
 
    for (int ly = 0; ly < 4; ly++) {
@@ -350,30 +389,35 @@ void Board::moveRight() {
          if (lx > 2)
             continue;
 
-         if (m_tiles[lx][ly].value <= 0)
+         if ((*tiles)[lx][ly].value <= 0)
             continue;
 
          int tx = lx;
 
          for (int mx = lx + 1; mx < 4; mx++)
-            if (0 == m_tiles[mx][ly].value)
+            if (0 == (*tiles)[mx][ly].value)
                tx = mx;
 
-         if (!merged && (tx<3) && (m_tiles[lx][ly].value == m_tiles[tx + 1][ly].value))
+         if (!merged && (tx<3) && ((*tiles)[lx][ly].value == (*tiles)[tx + 1][ly].value))
             tx++, merged = true;
             
-         if (tx > lx && moveTile(lx, ly, tx, ly))
+         if (tx > lx && moveTile(tiles, pos, lx, ly, tx, ly))
             addNew = true;
       }
    }
 
    if (addNew)
-      addTile();
+      addTile(tiles);
 
-   checkGameOver();
+   return checkGameOver(tiles, score);
 }
 
-void Board::moveUp() {
+
+bool Board::moveUp() {
+   return moveUp(&m_tiles, &m_pos, m_score);
+}
+
+bool Board::moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
    bool addNew = false;
 
 
@@ -384,30 +428,34 @@ void Board::moveUp() {
          if (ly < 1)
             continue;
 
-         if (m_tiles[lx][ly].value <= 0)
+         if ((*tiles)[lx][ly].value <= 0)
             continue;
 
          int ty = ly;
 
          for (int my = ly - 1; my > -1; my--)
-            if (0 == m_tiles[lx][my].value)
+            if (0 == (*tiles)[lx][my].value)
                ty = my;
 
-         if (!merged && (ty>0) && (m_tiles[lx][ly].value == m_tiles[lx][ty - 1].value))
+         if (!merged && (ty>0) && ((*tiles)[lx][ly].value == (*tiles)[lx][ty - 1].value))
             ty--, merged = true;
 
-         if (ty < ly && moveTile(lx, ly, lx, ty))
+         if (ty < ly && moveTile(tiles, pos, lx, ly, lx, ty))
             addNew = true;
       }
    }
    
    if (addNew)
-      addTile();
+      addTile(tiles);
 
-   checkGameOver();
+   return checkGameOver(tiles, score);
 }
 
-void Board::moveDown() {
+bool Board::moveDown() {
+   return moveDown(&m_tiles, &m_pos, m_score);
+}
+
+bool Board::moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
    bool addNew = false;
 
    for (int lx = 0; lx < 4; lx++) {
@@ -417,39 +465,70 @@ void Board::moveDown() {
          if (ly > 2)
             continue;
 
-         if (m_tiles[lx][ly].value <= 0)
+         if ((*tiles)[lx][ly].value <= 0)
             continue;
 
          int ty = ly;
 
          for (int my = ly + 1; my < 4; my++)
-            if (0 == m_tiles[lx][my].value)
+            if (0 == (*tiles)[lx][my].value)
                ty = my;
 
-         if (!merged && (ty<3) && (m_tiles[lx][ly].value == m_tiles[lx][ty+1].value))
+         if (!merged && (ty<3) && ((*tiles)[lx][ly].value == (*tiles)[lx][ty+1].value))
             ty++, merged = true;
 
-         if (ty > ly && moveTile(lx, ly, lx, ty))
+         if (ty > ly && moveTile(tiles, pos, lx, ly, lx, ty))
             addNew = true;
       }
    }
 
    if (addNew)
-      addTile();
+      addTile(tiles);
 
-   checkGameOver();
+   return checkGameOver(tiles, score);
 }
 
 // Reset game state
 void Board::newGame() {
-
-   m_score = 0;
-
-   for (int i=0;i<16;i++)
-      m_tiles[m_order_forward[i].px][m_order_forward[i].py].clear();
-
-   emit newScore(0);
-   addTile();
+   newGame(&m_tiles,m_score);
    viewport()->repaint();
 }
 
+void Board::newGame(Tile(*tiles)[4][4], int& score) {
+
+   score = 0;
+
+   for (int i=0;i<16;i++)
+      (*tiles)[g_order_forward[i].px][g_order_forward[i].py].clear();
+
+   addTile(tiles);
+}
+
+
+QVector<int> Board::getTileValues() {
+   QVector<int> tile_values;
+   for (int i = 0; i < 4; i++)
+      for (int j = 0; j < 4; i++)
+         tile_values.append(m_tiles[i][j].value);
+   return tile_values;
+}
+
+int Board::getScore() {
+   return m_score;
+}
+
+State Board::getState() {
+   /*
+   State state;
+   state.m_score = m_score;
+   
+   for (int i = 0; i < 4; i++)
+      for (int j = 0; j < 4; j++) {
+         state.m_tiles[i][j] = m_tiles[i][j];
+         state.m_pos[i][j] = m_pos[i][j];
+   }
+
+   return state;
+   */
+   return *this;
+}
