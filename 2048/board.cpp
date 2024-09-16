@@ -268,7 +268,7 @@ bool Board::canMove(Tile(*tiles)[4][4], int sx, int sy, int tx, int ty) {
 // It sets up the animation parameters for a a tile to be moved
 // from logical coordinates [sx,sy] to [tx,ty].
 
-bool Board::moveTile(Tile(*tiles)[4][4], Cell(*pos)[4][4], int sx, int sy, int tx, int ty) {
+bool Board::moveTile(Tile(*tiles)[4][4], Cell(*pos)[4][4], int sx, int sy, int tx, int ty, bool wait) {
 
    if (!canMove(tiles, sx, sy, tx, ty))
       return false;
@@ -289,8 +289,10 @@ bool Board::moveTile(Tile(*tiles)[4][4], Cell(*pos)[4][4], int sx, int sy, int t
 
    qDebug() << "move (" << sx << "," << sy << ") to (" << tx << "," << ty << ")";
 
-   while (isMoving(tiles))
-      qApp->processEvents();
+   if (wait) {
+      while (isMoving(tiles))
+         qApp->processEvents();
+   }
 
    return true;
 }
@@ -341,7 +343,7 @@ bool Board::moveLeft() {
    return moveLeft(&m_tiles, &m_pos, m_score);
 }
 
-bool Board::moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
+bool Board::moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait) {
    bool addNew = false;
 
    for (int ly = 0; ly < 4; ly++) {
@@ -364,7 +366,7 @@ bool Board::moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
          if (!merged && (tx > 0) && ((*tiles)[lx][ly].value == (*tiles)[tx - 1][ly].value))
             tx--, merged = true;
 
-         if (tx < lx && moveTile(tiles, pos, lx, ly, tx, ly))
+         if (tx < lx && moveTile(tiles, pos, lx, ly, tx, ly, wait))
             addNew = true;
       }
    }
@@ -379,7 +381,7 @@ bool Board::moveRight() {
    return moveRight(&m_tiles, &m_pos, m_score);
 }
 
-bool Board::moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
+bool Board::moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait) {
    bool addNew = false;
 
    for (int ly = 0; ly < 4; ly++) {
@@ -401,7 +403,7 @@ bool Board::moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
          if (!merged && (tx<3) && ((*tiles)[lx][ly].value == (*tiles)[tx + 1][ly].value))
             tx++, merged = true;
             
-         if (tx > lx && moveTile(tiles, pos, lx, ly, tx, ly))
+         if (tx > lx && moveTile(tiles, pos, lx, ly, tx, ly, wait))
             addNew = true;
       }
    }
@@ -417,7 +419,7 @@ bool Board::moveUp() {
    return moveUp(&m_tiles, &m_pos, m_score);
 }
 
-bool Board::moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
+bool Board::moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait) {
    bool addNew = false;
 
 
@@ -440,7 +442,7 @@ bool Board::moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
          if (!merged && (ty>0) && ((*tiles)[lx][ly].value == (*tiles)[lx][ty - 1].value))
             ty--, merged = true;
 
-         if (ty < ly && moveTile(tiles, pos, lx, ly, lx, ty))
+         if (ty < ly && moveTile(tiles, pos, lx, ly, lx, ty, wait))
             addNew = true;
       }
    }
@@ -455,7 +457,7 @@ bool Board::moveDown() {
    return moveDown(&m_tiles, &m_pos, m_score);
 }
 
-bool Board::moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
+bool Board::moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait) {
    bool addNew = false;
 
    for (int lx = 0; lx < 4; lx++) {
@@ -477,7 +479,7 @@ bool Board::moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score) {
          if (!merged && (ty<3) && ((*tiles)[lx][ly].value == (*tiles)[lx][ty+1].value))
             ty++, merged = true;
 
-         if (ty > ly && moveTile(tiles, pos, lx, ly, lx, ty))
+         if (ty > ly && moveTile(tiles, pos, lx, ly, lx, ty, wait))
             addNew = true;
       }
    }

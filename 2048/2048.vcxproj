@@ -79,6 +79,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
+      <PreprocessorDefinitions>DEBUG;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -87,6 +88,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
+      <PreprocessorDefinitions>NODBG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Vcpkg">
@@ -96,7 +98,7 @@
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>

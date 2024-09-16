@@ -16,6 +16,20 @@ Cell& Cell::operator =(Cell& other) {
    return *this;
 }
 
+bool Cell::operator ==(Cell& other) {
+   if (px != other.px)
+      return false;
+
+   if (py != other.py)
+      return false;
+
+   return true;
+}
+
+bool Cell::operator !=(Cell& other) {
+   return !operator==(other);
+}
+
 void Cell::clear() {
    px = 0;
    py = 0;

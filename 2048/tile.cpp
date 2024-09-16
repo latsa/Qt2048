@@ -21,6 +21,27 @@ Tile& Tile::operator =(Tile& other) {
    return *this;
 }
 
+bool Tile::operator==(Tile& other) {
+   if (value != other.value)
+      return false;
+   if (ismoving != other.ismoving)
+      return false;
+   if (lsource != other.lsource)
+      return false;
+   if (ltarget != other.ltarget)
+      return false;
+   if (psource != other.psource)
+      return false;
+   if (ptarget != other.ptarget)
+      return false;
+
+   return true;
+}
+
+bool Tile::operator!=(Tile& other) {
+   return !operator==(other);
+}
+
 void Tile::clear() {
    value = 0;
    ismoving = false;

@@ -14,6 +14,8 @@ struct Tile {
    
    Tile(int val = 0);
    Tile& operator =(Tile& other);
+   bool operator==(Tile& other);
+   bool operator!=(Tile& other);
    void clear();
    void dump(QString prompt = QString());
 };

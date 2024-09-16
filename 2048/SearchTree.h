@@ -31,6 +31,7 @@ public:
 private:
    int m_steps = 0;
    SearchNode* m_root = nullptr;
+   State m_state;
    QVector<SearchNode*> m_bestpath;
 };
 

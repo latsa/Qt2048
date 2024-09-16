@@ -24,10 +24,10 @@ public:
    QVector<int> getTileValues();
    int getScore();
 
-   static bool moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score);
-   static bool moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score);
-   static bool moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score);
-   static bool moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score);
+   static bool moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
+   static bool moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
+   static bool moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
+   static bool moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
    State getState();
 
 protected:
@@ -46,7 +46,7 @@ private:
    void updateTile(int lx, int ly);
    static int addTile(Tile(*tiles)[4][4]);
    static int freeSlots(Tile(*tiles)[4][4]);
-   static bool moveTile(Tile(*tiles)[4][4], Cell(*pos)[4][4], int sx, int sy, int tx, int ty);
+   static bool moveTile(Tile(*tiles)[4][4], Cell(*pos)[4][4], int sx, int sy, int tx, int ty, bool wait = true);
    static bool canMove(Tile(*tiles)[4][4], int sx, int sy, int tx, int ty);
    static bool isMoving(Tile(*tiles)[4][4]);
    static bool checkGameOver(Tile(*tiles)[4][4], int& score);
@@ -54,5 +54,5 @@ private:
    QGraphicsScene* m_graphicsScene = Q_NULLPTR;
    QWidget* m_parent = Q_NULLPTR;
    QTimer* m_animation_timer = Q_NULLPTR;
-   const int m_animation_speed = 20;
+   const int m_animation_speed = 10;
 };

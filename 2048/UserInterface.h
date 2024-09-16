@@ -2,7 +2,6 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_UserInterface.h"
 #include "DlgAbout.h"
-#include "board.h"
 #include <QSettings>
 #include <QPoint>
 #include <QTimer>
