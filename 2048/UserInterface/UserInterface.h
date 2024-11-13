@@ -2,7 +2,7 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_UserInterface.h"
 #include "DlgAbout.h"
-#include <QSettings>
+
 #include <QPoint>
 #include <QTimer>
 
@@ -22,28 +22,35 @@ protected:
    void mouseMoveEvent(QMouseEvent* evt) override;
 
 private slots:
-   void newGame();
-   void about();
-   void settings();
-   void score(int v);
-   void solve();
-   void nextMove();
-   void cancel();
+   // push button handlers
+   void solve();   // start/pause automatic solver
+   void cancel();  // cancel automatic solving
+   void newGame(); // start new game
+
+   void about();   // show about dialog
+   void settings();// show settings dialog
+   void undo();    // undo last move
+
+   void exit();
+
+   // calculate next move automatically
+   void nextMove();   
+   
+   // update game score display
+   void score(int v, int b); 
+
 
 private:
    Ui::MainUserInterfaceClass ui;
+
+   // automatic solver
+   QTimer* m_solver = Q_NULLPTR;
    bool m_solving = false;
    bool m_paused = false;
-   QTimer* m_solver = Q_NULLPTR;
-
-   QSettings m_settings;
+   
    DlgAbout* m_dlgAbout = Q_NULLPTR;
 
    // mouse input state
    QPoint m_mouse_oldPos;
    bool m_mouse_dragging = false;
-
-
-   int m_score = 0;
-   int m_best = 0;
 };

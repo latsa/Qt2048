@@ -1,33 +1,38 @@
 #pragma once
+#include <QSettings>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QMap>
 #include <QVector>
+#include <QStack>
 #include <QPoint>
 #include <QTimer>
 #include <QDebug>
 #include "State.h"
+#include "cell.h"
 
 class Board : 
-   public QGraphicsView,
-   public State {
+   public QGraphicsView {
    Q_OBJECT
 
 public:
    Board(QWidget* parent);
    void newGame();
-   static void newGame(Tile(*tiles)[4][4], int& score);
+   void newGame(Tile(*tiles)[4][4], int& score);
    bool moveLeft();
    bool moveRight();
    bool moveUp();
    bool moveDown();
    QVector<int> getTileValues();
    int getScore();
+   int getBest();
+   void undo();
+   void exit();
 
-   static bool moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
-   static bool moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
-   static bool moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
-   static bool moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
+   bool moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
+   bool moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
+   bool moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
+   bool moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait = true);
    State getState();
 
 protected:
@@ -37,22 +42,29 @@ protected:
    void mouseMoveEvent(QMouseEvent* evt) override;
 
 signals:
-   void newScore(int val);
+   void newScore(int val, int best);
 
 private slots:
    void animation_timeout();
 
 private:
    void updateTile(int lx, int ly);
-   static int addTile(Tile(*tiles)[4][4]);
-   static int freeSlots(Tile(*tiles)[4][4]);
+   int addTile(Tile(*tiles)[4][4]);
+   int freeSlots(Tile(*tiles)[4][4]);
    static bool moveTile(Tile(*tiles)[4][4], Cell(*pos)[4][4], int sx, int sy, int tx, int ty, bool wait = true);
    static bool canMove(Tile(*tiles)[4][4], int sx, int sy, int tx, int ty);
    static bool isMoving(Tile(*tiles)[4][4]);
-   static bool checkGameOver(Tile(*tiles)[4][4], int& score);
+   bool checkGameOver(Tile(*tiles)[4][4], int& score);
 
    QGraphicsScene* m_graphicsScene = Q_NULLPTR;
    QWidget* m_parent = Q_NULLPTR;
    QTimer* m_animation_timer = Q_NULLPTR;
-   const int m_animation_speed = 10;
+   const int m_animation_speed = 20;
+
+   QSettings m_settings;
+
+   State m_state;
+   QStack<State> m_state_stack;
+
+   int m_best = 0; // best game score
 };

@@ -36,14 +36,17 @@ static QMap<int, QColor> g_bg_map = {
 
 Board::Board(QWidget* parent): 
    m_parent(parent) {
+
    m_graphicsScene = new QGraphicsScene(this);
    setScene(m_graphicsScene);
+
+   m_best = m_settings.value("highscore", 0).toInt();
 
    m_animation_timer = new QTimer(this);
    connect(m_animation_timer,SIGNAL(timeout()),this,SLOT(animation_timeout()));
    m_animation_timer->start(1);
 
-   addTile(&m_tiles);
+   addTile(&m_state.m_tiles);
 }
 
 // Returns the number of free slots.
@@ -82,35 +85,40 @@ int Board::addTile(Tile(*tiles)[4][4]) {
    int val = QRandomGenerator::global()->bounded(4) < 2 ? 2 : 4;
 
    (*tiles)[g_order_forward[pos].px][g_order_forward[pos].py].value = val;
+
    return free_slot_count - 1;
 }
 
 void Board::updateTile(int lx, int ly) {
-   m_tiles[lx][ly].ismoving = false;
+   m_state.m_tiles[lx][ly].ismoving = false;
    
 
-   int x = m_tiles[lx][ly].ltarget.px;
-   int y = m_tiles[lx][ly].ltarget.py;
+   int x = m_state.m_tiles[lx][ly].ltarget.px;
+   int y = m_state.m_tiles[lx][ly].ltarget.py;
    
    // clear target tile but preserve its value
-   int value = m_tiles[x][y].value;
-   m_tiles[x][y].clear();
-   m_tiles[x][y].value = value;
+   int value = m_state.m_tiles[x][y].value;
+   m_state.m_tiles[x][y].clear();
+   m_state.m_tiles[x][y].value = value;
 
    // update source of target tile
-   m_tiles[x][y].lsource.px = lx;
-   m_tiles[x][y].lsource.py = ly;
+   m_state.m_tiles[x][y].lsource.px = lx;
+   m_state.m_tiles[x][y].lsource.py = ly;
 
    // update score
-   m_score += m_tiles[lx][ly].value;
-   emit newScore(m_score);
+   m_state.m_score += m_state.m_tiles[lx][ly].value;
+
+   if (m_best < m_state.m_score)
+      m_best = m_state.m_score;
+
+   emit newScore(m_state.m_score, m_best);
 
    // update value of target tile
-   if ((m_tiles[x][y].value == 0) || (m_tiles[x][y].value == m_tiles[lx][ly].value))
-      m_tiles[x][y].value += m_tiles[lx][ly].value;
+   if ((m_state.m_tiles[x][y].value == 0) || (m_state.m_tiles[x][y].value == m_state.m_tiles[lx][ly].value))
+      m_state.m_tiles[x][y].value += m_state.m_tiles[lx][ly].value;
 
    // reset source tile   
-   m_tiles[lx][ly].value = 0;
+   m_state.m_tiles[lx][ly].value = 0;
 }
 
 
@@ -121,46 +129,46 @@ void Board::animation_timeout() {
       for (int lx = 0; lx < 4; lx++) {
 
          // if tile arrived it should not move anymore
-         if (m_tiles[lx][ly].psource.px == m_tiles[lx][ly].ptarget.px)
-            if (m_tiles[lx][ly].psource.py == m_tiles[lx][ly].ptarget.py)
-               m_tiles[lx][ly].ismoving = false;
+         if (m_state.m_tiles[lx][ly].psource.px == m_state.m_tiles[lx][ly].ptarget.px)
+            if (m_state.m_tiles[lx][ly].psource.py == m_state.m_tiles[lx][ly].ptarget.py)
+               m_state.m_tiles[lx][ly].ismoving = false;
 
          // if tile is not moving we don't do anything with it
-         if (!m_tiles[lx][ly].ismoving)
+         if (!m_state.m_tiles[lx][ly].ismoving)
             continue;
 
          // if tile is moving to the right, increment the x component of the tile's pixel position
-         if (m_tiles[lx][ly].psource.px < m_tiles[lx][ly].ptarget.px) {
-            m_tiles[lx][ly].pcurrent.px+=m_animation_speed;
+         if (m_state.m_tiles[lx][ly].psource.px < m_state.m_tiles[lx][ly].ptarget.px) {
+            m_state.m_tiles[lx][ly].pcurrent.px+=m_animation_speed;
             redraw = true;
-            if (m_tiles[lx][ly].pcurrent.px >= m_tiles[lx][ly].ptarget.px) {
+            if (m_state.m_tiles[lx][ly].pcurrent.px >= m_state.m_tiles[lx][ly].ptarget.px) {
                updateTile(lx,ly);
             }
          } 
 
          // if tile is moving to the left, decrement the x component of the tile's pixel position
-         if (m_tiles[lx][ly].psource.px > m_tiles[lx][ly].ptarget.px) {
-            m_tiles[lx][ly].pcurrent.px-= m_animation_speed;
+         if (m_state.m_tiles[lx][ly].psource.px > m_state.m_tiles[lx][ly].ptarget.px) {
+            m_state.m_tiles[lx][ly].pcurrent.px-= m_animation_speed;
             redraw = true;
-            if (m_tiles[lx][ly].pcurrent.px <= m_tiles[lx][ly].ptarget.px) {
+            if (m_state.m_tiles[lx][ly].pcurrent.px <= m_state.m_tiles[lx][ly].ptarget.px) {
                updateTile(lx, ly);
             }
          }
 
          // if tile is moving downwards, increment the y component of the tile's pixel position
-         if (m_tiles[lx][ly].psource.py < m_tiles[lx][ly].ptarget.py) {
-            m_tiles[lx][ly].pcurrent.py+= m_animation_speed;
+         if (m_state.m_tiles[lx][ly].psource.py < m_state.m_tiles[lx][ly].ptarget.py) {
+            m_state.m_tiles[lx][ly].pcurrent.py+= m_animation_speed;
             redraw = true;
-            if (m_tiles[lx][ly].pcurrent.py >= m_tiles[lx][ly].ptarget.py) {
+            if (m_state.m_tiles[lx][ly].pcurrent.py >= m_state.m_tiles[lx][ly].ptarget.py) {
                updateTile(lx, ly);
             }
          }
 
          // if tile is moving upwards, decrement the y component of the tile's pixel position
-         if (m_tiles[lx][ly].psource.py > m_tiles[lx][ly].ptarget.py) {
-            m_tiles[lx][ly].pcurrent.py-= m_animation_speed;
+         if (m_state.m_tiles[lx][ly].psource.py > m_state.m_tiles[lx][ly].ptarget.py) {
+            m_state.m_tiles[lx][ly].pcurrent.py-= m_animation_speed;
             redraw = true;
-            if (m_tiles[lx][ly].pcurrent.py <= m_tiles[lx][ly].ptarget.py) {
+            if (m_state.m_tiles[lx][ly].pcurrent.py <= m_state.m_tiles[lx][ly].ptarget.py) {
                updateTile(lx, ly);
             }
          }
@@ -189,17 +197,17 @@ void Board::drawForeground(QPainter* painter, const QRectF& rect) {
 
          int px = rect.x() + qreal(w4) * lx;
          int py = rect.y() + qreal(h4) * ly;
-         m_pos[lx][ly].px = px;
-         m_pos[lx][ly].py = py;
+         m_state.m_pos[lx][ly].px = px;
+         m_state.m_pos[lx][ly].py = py;
 
-         if (m_tiles[lx][ly].value) {
+         if (m_state.m_tiles[lx][ly].value) {
 
-            if (m_tiles[lx][ly].ismoving) {
-               px = m_tiles[lx][ly].pcurrent.px;
-               py = m_tiles[lx][ly].pcurrent.py;
+            if (m_state.m_tiles[lx][ly].ismoving) {
+               px = m_state.m_tiles[lx][ly].pcurrent.px;
+               py = m_state.m_tiles[lx][ly].pcurrent.py;
             }
 
-            int val = m_tiles[lx][ly].value;
+            int val = m_state.m_tiles[lx][ly].value;
             if (val > 4096)
                val = 4096;
 
@@ -219,7 +227,7 @@ void Board::drawForeground(QPainter* painter, const QRectF& rect) {
             painter->setFont(font);
 
             QRect r = { px, py, int(w4), int(h4) };
-            painter->drawText(r, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(m_tiles[lx][ly].value), &r);
+            painter->drawText(r, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(m_state.m_tiles[lx][ly].value), &r);
          }
       }
 }
@@ -332,15 +340,39 @@ bool Board::checkGameOver(Tile(*tiles)[4][4], int& score) {
    }
 
    if (gameover) {
-      QMessageBox::information(0, "2048", "Game over! Try again.", QMessageBox::StandardButton::Retry);
-      newGame(tiles, score);
+      //QMessageBox::information(0, "2048", "Game over! Try again.", QMessageBox::StandardButton::Retry | QMessageBox::StandardButton::Discard);
+
+      QMessageBox messageBox(QMessageBox::Question,
+         tr("2048"), tr("Game over!"),
+         QMessageBox::StandardButton::Apply | QMessageBox::StandardButton::Discard | QMessageBox::StandardButton::Close,
+         NULL);
+
+      messageBox.setButtonText(QMessageBox::StandardButton::Apply, tr("&New Game"));
+      messageBox.setButtonText(QMessageBox::StandardButton::Discard, tr("&Undo Last Move"));
+      messageBox.setButtonText(QMessageBox::StandardButton::Close, tr("&Quit Game"));
+
+      int rc = messageBox.exec();
+      
+      switch (rc) {
+         case QMessageBox::StandardButton::Apply:
+            newGame(tiles, score);
+         break;
+         case QMessageBox::StandardButton::Discard:
+            undo();
+         break;
+         case QMessageBox::StandardButton::Close:
+            exit();
+         break;
+      }
+
    }
 
    return gameover;
 }
 
 bool Board::moveLeft() {
-   return moveLeft(&m_tiles, &m_pos, m_score);
+   m_state_stack.push(m_state);
+   return moveLeft(&m_state.m_tiles, &m_state.m_pos, m_state.m_score);
 }
 
 bool Board::moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait) {
@@ -378,7 +410,8 @@ bool Board::moveLeft(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait
 }
 
 bool Board::moveRight() {
-   return moveRight(&m_tiles, &m_pos, m_score);
+   m_state_stack.push(m_state);
+   return moveRight(&m_state.m_tiles, &m_state.m_pos, m_state.m_score);
 }
 
 bool Board::moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait) {
@@ -416,7 +449,8 @@ bool Board::moveRight(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wai
 
 
 bool Board::moveUp() {
-   return moveUp(&m_tiles, &m_pos, m_score);
+   m_state_stack.push(m_state);
+   return moveUp(&m_state.m_tiles, &m_state.m_pos, m_state.m_score);
 }
 
 bool Board::moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait) {
@@ -454,7 +488,8 @@ bool Board::moveUp(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait) 
 }
 
 bool Board::moveDown() {
-   return moveDown(&m_tiles, &m_pos, m_score);
+   m_state_stack.push(m_state);
+   return moveDown(&m_state.m_tiles, &m_state.m_pos, m_state.m_score);
 }
 
 bool Board::moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait) {
@@ -492,7 +527,7 @@ bool Board::moveDown(Tile(*tiles)[4][4], Cell(*pos)[4][4], int& score, bool wait
 
 // Reset game state
 void Board::newGame() {
-   newGame(&m_tiles,m_score);
+   newGame(&m_state.m_tiles, m_state.m_score);
    viewport()->repaint();
 }
 
@@ -511,26 +546,34 @@ QVector<int> Board::getTileValues() {
    QVector<int> tile_values;
    for (int i = 0; i < 4; i++)
       for (int j = 0; j < 4; i++)
-         tile_values.append(m_tiles[i][j].value);
+         tile_values.append(m_state.m_tiles[i][j].value);
    return tile_values;
 }
 
 int Board::getScore() {
-   return m_score;
+   return m_state.m_score;
+}
+
+int Board::getBest() {
+   return m_best;
 }
 
 State Board::getState() {
-   /*
-   State state;
-   state.m_score = m_score;
-   
-   for (int i = 0; i < 4; i++)
-      for (int j = 0; j < 4; j++) {
-         state.m_tiles[i][j] = m_tiles[i][j];
-         state.m_pos[i][j] = m_pos[i][j];
-   }
+   return m_state;
+}
 
-   return state;
-   */
-   return *this;
+void Board::undo() {
+
+   if (m_state_stack.size())
+      m_state = m_state_stack.pop();
+
+   if (freeSlots(&m_state.m_tiles) >= 16)
+      addTile(&m_state.m_tiles);
+
+   viewport()->update();
+}
+
+void Board::exit() {
+   m_settings.setValue("highscore", m_best);
+   QApplication::quit();
 }

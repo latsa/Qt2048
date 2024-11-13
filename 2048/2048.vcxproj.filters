@@ -3,22 +3,15 @@
   <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd;qml;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd;qml;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;ui</Extensions>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Form Files">
-      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
-      <Extensions>ui</Extensions>
-    </Filter>
     <Filter Include="Translation Files">
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
-    </Filter>
-    <Filter Include="Source Files\Widgets">
-      <UniqueIdentifier>{5e75aebb-695b-46df-887d-f57b2ae0b920}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{3952ba85-1675-41b1-967c-72ccf73e0c37}</UniqueIdentifier>
@@ -26,6 +19,52 @@
     <Filter Include="Source Files\AI">
       <UniqueIdentifier>{f75c59c9-7c21-44ce-a840-5f8fd04420ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\User Interface">
+      <UniqueIdentifier>{07e9740b-af54-4dc1-a84f-6e19323f3776}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\User Interface\Widgets">
+      <UniqueIdentifier>{5e75aebb-695b-46df-887d-f57b2ae0b920}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\User Interface\DlgAbout">
+      <UniqueIdentifier>{0ad9fc4d-93bd-49fd-857d-ca3b80159d6b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\UserInterface.cpp">
+      <Filter>Source Files\User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\Widgets\Label.cpp">
+      <Filter>Source Files\User Interface\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\Widgets\PushButton.cpp">
+      <Filter>Source Files\User Interface\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\DlgAbout\DlgAbout.cpp">
+      <Filter>Source Files\User Interface\DlgAbout</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\board.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\cell.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\State.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\tile.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="AI\SearchTree.cpp">
+      <Filter>Source Files\AI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="2048.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="main.qrc">
@@ -33,79 +72,47 @@
     </QtRcc>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgAbout.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UserInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Label.cpp">
-      <Filter>Source Files\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="PushButton.cpp">
-      <Filter>Source Files\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="board.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="tile.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="cell.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="SearchTree.cpp">
-      <Filter>Source Files\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="State.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="DlgAbout.h">
-      <Filter>Source Files</Filter>
-    </QtMoc>
-    <QtMoc Include="UserInterface.h">
-      <Filter>Source Files</Filter>
-    </QtMoc>
-    <QtMoc Include="Label.h">
-      <Filter>Source Files\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="PushButton.h">
-      <Filter>Source Files\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="board.h">
-      <Filter>Source Files\Game</Filter>
-    </QtMoc>
-  </ItemGroup>
-  <ItemGroup>
-    <QtUic Include="DlgAbout.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="UserInterface.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="tile.h">
-      <Filter>Source Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="cell.h">
-      <Filter>Source Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="SearchTree.h">
-      <Filter>Source Files\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="State.h">
-      <Filter>Source Files\Game</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="2048.rc">
+    <Image Include="2048.ico">
       <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="UserInterface\UserInterface.h">
+      <Filter>Source Files\User Interface</Filter>
+    </QtMoc>
+    <QtMoc Include="UserInterface\Widgets\Label.h">
+      <Filter>Source Files\User Interface\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="UserInterface\Widgets\PushButton.h">
+      <Filter>Source Files\User Interface\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="UserInterface\DlgAbout\DlgAbout.h">
+      <Filter>Source Files\User Interface\DlgAbout</Filter>
+    </QtMoc>
+    <QtMoc Include="Game\board.h">
+      <Filter>Source Files\Game</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="UserInterface\UserInterface.ui">
+      <Filter>Source Files\User Interface</Filter>
+    </QtUic>
+    <QtUic Include="UserInterface\DlgAbout\DlgAbout.ui">
+      <Filter>Source Files\User Interface\DlgAbout</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game\cell.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\State.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\tile.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="AI\SearchTree.h">
+      <Filter>Source Files\AI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

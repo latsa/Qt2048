@@ -21,16 +21,20 @@ UserInterface::UserInterface(QWidget *parent)
    connect(ui.pbSettings, SIGNAL(clicked()), this, SLOT(settings()));
    connect(ui.pbSolve, SIGNAL(clicked()), this, SLOT(solve()));
    connect(ui.pbCancel, SIGNAL(clicked()), this, SLOT(cancel()));
-   connect(ui.gvBoard, SIGNAL(newScore(int)), this, SLOT(score(int)));
+   connect(ui.pbUndo, SIGNAL(clicked()), this, SLOT(undo()));
+   connect(ui.pbExit, SIGNAL(clicked()), this, SLOT(exit()));
+   connect(ui.gvBoard, SIGNAL(newScore(int, int)), this, SLOT(score(int, int)));
 
    // Set board size based on the screen size. Make sure the playing area is square.
+   
    QDesktopWidget desk;
    int a = std::min(desk.width(), desk.height()) * 0.8;
-   int s = a * 0.813;
-   setFixedSize(QSize(a * 0.84, a * 1.02));
+   int s = a * 0.7;
+   setFixedSize(QSize(a, a * 0.925));
    ui.gvBoard->setFixedSize(QSize(s, s));
-   m_best = m_settings.value("highscore",0).toInt();
-   ui.lblBestValue->setText(QString::number(m_best));
+   ui.frame->setFixedSize(QSize(s,90));
+
+   ui.lblBestValue->setText(QString::number(ui.gvBoard->getBest()));
 
    ui.pbCancel->hide();
    ui.pbSettings->hide();
@@ -43,12 +47,15 @@ Board* UserInterface::getBoard() {
    return ui.gvBoard;
 }
 
+//
+// Keyboard event handlers
+//
+
 void UserInterface::keyPressEvent(QKeyEvent* event) {
    bool gameover = false;
 
    if (event->key() == Qt::Key_Escape) {
-      m_settings.setValue("highscore", m_best);
-      QApplication::quit();
+      exit();
    } else if (!m_solving) {
       if (event->key() == Qt::Key_Left || event->key() == Qt::Key_A) {
          if (!m_paused)
@@ -71,6 +78,10 @@ void UserInterface::keyPressEvent(QKeyEvent* event) {
    ui.gvBoard->viewport()->repaint();
 }
 
+//
+// Mouse event handlers
+//
+
 void UserInterface::mousePressEvent(QMouseEvent* evt) {
    m_mouse_oldPos = evt->globalPos();
    m_mouse_dragging = true;
@@ -89,9 +100,17 @@ void UserInterface::mouseMoveEvent(QMouseEvent* evt) {
    m_mouse_oldPos = evt->globalPos();
 }
 
+//
+// Pushbutton handlers
+//
+
 void UserInterface::newGame() {
    cancel();
    ui.gvBoard->newGame();
+}
+
+void UserInterface::undo() {
+   ui.gvBoard->undo();
 }
 
 void UserInterface::about() {
@@ -102,19 +121,12 @@ void UserInterface::about() {
    m_dlgAbout->show();
 }
 
-void UserInterface::settings() {
-   QMessageBox::information(this,tr("Q2048 Settings"),tr("This feature is not yet implemented."),tr("OK"));
+void UserInterface::exit() {
+   ui.gvBoard->exit();
 }
 
-void UserInterface::score(int v) {
-   m_score = (v>0) ? v : 0;
-   ui.lblScoreValue->setText(QString::number(m_score));
-
-   if (m_best < m_score) {
-      m_best = m_score;
-      ui.lblBestValue->setText(QString::number(m_best));
-   }
-
+void UserInterface::settings() {
+   QMessageBox::information(this, tr("Q2048 Settings"), tr("This feature is not yet implemented."), tr("OK"));
 }
 
 void UserInterface::solve() {
@@ -123,37 +135,12 @@ void UserInterface::solve() {
       m_paused = true;
       ui.pbSolve->setText(tr("Continue"));
       //..
-   } else {
+   }
+   else {
       m_solving = true;
       m_paused = false;
       ui.pbCancel->show();
       ui.pbSolve->setText(tr("Pause"));
-   }
-}
-
-void UserInterface::nextMove() {
-
-   if (!m_solving) 
-      return;
-
-   //State state = ui.gvBoard->getState();
-   State state = *ui.gvBoard;
-
-   SearchTree searchTree(state, 10);
-   
-   switch(searchTree.getNextMove()) {
-      case MOVE_LEFT:
-         ui.gvBoard->moveLeft();
-         break;
-      case MOVE_RIGHT:
-         ui.gvBoard->moveRight();
-         break;
-      case MOVE_UP:
-         ui.gvBoard->moveUp();
-         break;
-      case MOVE_DOWN:
-         ui.gvBoard->moveDown();
-         break;
    }
 }
 
@@ -162,4 +149,42 @@ void UserInterface::cancel() {
    m_paused = false;
    ui.pbCancel->hide();
    ui.pbSolve->setText(tr("Solve!"));
+}
+
+//
+// Update score display and keep track of best score
+//
+
+void UserInterface::score(int v, int b) {
+   ui.lblScoreValue->setText(QString::number(v));
+   ui.lblBestValue->setText(QString::number(b));
+}
+
+//
+// Calculate next move automatically
+//
+
+void UserInterface::nextMove() {
+
+   if (!m_solving)
+      return;
+
+   State state = ui.gvBoard->getState();
+
+   SearchTree searchTree(state, 10);
+
+   switch (searchTree.getNextMove()) {
+   case MOVE_LEFT:
+      ui.gvBoard->moveLeft();
+      break;
+   case MOVE_RIGHT:
+      ui.gvBoard->moveRight();
+      break;
+   case MOVE_UP:
+      ui.gvBoard->moveUp();
+      break;
+   case MOVE_DOWN:
+      ui.gvBoard->moveDown();
+      break;
+   }
 }

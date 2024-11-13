@@ -4,7 +4,7 @@
 int main(int argc, char *argv[]) {
    QApplication a(argc, argv);
    QApplication::setOrganizationName("AlgoFlux");
-   QApplication::setOrganizationDomain("algoflux.eu");
+   QApplication::setOrganizationDomain("algoflux.io");
    QApplication::setApplicationName("2048");
 
    UserInterface mainWindow;

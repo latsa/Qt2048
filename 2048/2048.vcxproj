@@ -16,6 +16,52 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AI\SearchTree.cpp" />
+    <ClCompile Include="Game\board.cpp" />
+    <ClCompile Include="Game\cell.cpp" />
+    <ClCompile Include="Game\State.cpp" />
+    <ClCompile Include="Game\tile.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="UserInterface\DlgAbout\DlgAbout.cpp" />
+    <ClCompile Include="UserInterface\UserInterface.cpp" />
+    <ClCompile Include="UserInterface\Widgets\Label.cpp" />
+    <ClCompile Include="UserInterface\Widgets\PushButton.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="2048.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="main.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="2048.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="UserInterface\UserInterface.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="UserInterface\DlgAbout\DlgAbout.ui" />
+    <QtUic Include="UserInterface\UserInterface.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="UserInterface\Widgets\Label.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="UserInterface\Widgets\PushButton.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="UserInterface\DlgAbout\DlgAbout.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Game\board.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AI\SearchTree.h" />
+    <ClInclude Include="Game\cell.h" />
+    <ClInclude Include="Game\State.h" />
+    <ClInclude Include="Game\tile.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DDFDD1B4-5C80-4D7D-BA83-7F5B1AFBE14A}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
@@ -80,6 +126,7 @@
       </DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
       <PreprocessorDefinitions>DEBUG;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>AI;Game;UserInterface;UserInterface\DlgAbout;UserInterface\Widgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -89,6 +136,7 @@
       </DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
       <PreprocessorDefinitions>NODBG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>AI;Game;UserInterface;UserInterface\DlgAbout;UserInterface\Widgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Vcpkg">
@@ -118,43 +166,6 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="cell.cpp" />
-    <ClCompile Include="SearchTree.cpp" />
-    <ClCompile Include="State.cpp" />
-    <ClCompile Include="tile.cpp" />
-    <ClCompile Include="UserInterface.cpp" />
-    <ClCompile Include="PushButton.cpp" />
-    <QtRcc Include="main.qrc" />
-    <QtUic Include="UserInterface.ui" />
-    <QtUic Include="DlgAbout.ui" />
-    <ClCompile Include="board.cpp" />
-    <ClCompile Include="DlgAbout.cpp" />
-    <ClCompile Include="Label.cpp" />
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="board.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="DlgAbout.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="Label.h" />
-    <QtMoc Include="PushButton.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="UserInterface.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="cell.h" />
-    <ClInclude Include="SearchTree.h" />
-    <ClInclude Include="State.h" />
-    <ClInclude Include="tile.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="2048.rc" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />

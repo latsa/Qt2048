@@ -19,7 +19,7 @@ bool State::operator!=(State& other) {
    return !operator==(other);
 }
 
-State& State::operator=(State& other) {
+State& State::operator=(State other) {
    if (this == &other)
       return *this;
 

@@ -6,7 +6,7 @@ Cell::Cell(int _px, int _py) :
 }
 
 
-Cell& Cell::operator =(Cell& other) {
+Cell& Cell::operator =(Cell other) {
    if (this == &other)
       return *this;
 
