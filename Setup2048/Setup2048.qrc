@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/Setup2048">
-        <file>App/App.zip</file>
-    </qresource>
-</RCC>
